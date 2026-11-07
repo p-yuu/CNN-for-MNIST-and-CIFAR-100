@@ -113,17 +113,3 @@ class CIFAR100CNNV2(nn.Module):
         x = self.features(x)
         x = self.classifier(x)
         return x
-
-    
-if __name__ == "__main__":
-    model = CIFAR100CNNV2()
-
-    x = torch.randn(128, 3, 32, 32)
-    output = model(x)
-
-    print("Input shape:", x.shape)
-    print("Output shape:", output.shape)
-    print(
-        "Trainable parameters:",
-        sum(p.numel() for p in model.parameters() if p.requires_grad)
-    )
