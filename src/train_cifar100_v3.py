@@ -35,6 +35,19 @@ def set_seed(seed):
         torch.cuda.manual_seed_all(seed)
 
 
+def mixup_data(images, labels, alpha=0.2):
+    lam = np.random.beta(alpha, alpha)
+
+    batch_size = images.size(0)
+    indices = torch.randperm(batch_size,device=images.device)
+
+    mixed_images = (lam * images + (1 - lam) * images[indices])
+
+    labels_a = labels
+    labels_b = labels[indices]
+
+    return mixed_images, labels_a, labels_b, lam
+
 
 def train_one_epoch(model, loader, criterion, optimizer, device, epoch):
     model.train()
@@ -51,8 +64,9 @@ def train_one_epoch(model, loader, criterion, optimizer, device, epoch):
 
         optimizer.zero_grad()
 
+        images, labels_a, labels_b, lam = mixup_data(images, labels, alpha=0.2)
         outputs = model(images)
-        loss = criterion(outputs, labels)
+        loss = (lam * criterion(outputs, labels_a) + (1 - lam) * criterion(outputs, labels_b))
 
         loss.backward()
         optimizer.step()
@@ -61,7 +75,7 @@ def train_one_epoch(model, loader, criterion, optimizer, device, epoch):
         total_loss += loss.item() * batch_size
 
         predictions = outputs.argmax(dim=1)
-        correct += (predictions == labels).sum().item()
+        correct += (lam * (predictions == labels_a).sum().item() + (1 - lam) * (predictions == labels_b).sum().item())
         total += batch_size
 
         progress_bar.set_postfix(loss=f"{total_loss / total:.4f}",acc=f"{correct / total * 100:.2f}%")
@@ -110,8 +124,8 @@ def main():
     best_epoch = 0
     history = []
 
-    model_path = MODEL_DIR / "best_cifar100_v3_2.pth"
-    csv_path = RESULT_DIR / "cifar100_v3_2_history.csv"
+    model_path = MODEL_DIR / "best_cifar100_v3_3.pth"
+    csv_path = RESULT_DIR / "cifar100_v3_3_history.csv"
 
     for epoch in range(1, EPOCHS + 1):
         current_lr = optimizer.param_groups[0]["lr"]
