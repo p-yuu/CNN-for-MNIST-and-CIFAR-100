@@ -71,7 +71,13 @@ def get_cifar100_loaders(batch_size=128, augment=False):
             transforms.RandomCrop(32, padding=4),       # 隨機裁切
             transforms.RandomHorizontalFlip(p=0.5),     # 隨機水平翻轉
             transforms.ToTensor(),                      # 轉換成 Tensor
-            transforms.Normalize(mean, std)
+            transforms.Normalize(mean, std),
+            transforms.RandomErasing(                   # 隨機遮蔽
+                p=0.25,
+                scale=(0.02, 0.10),
+                ratio=(0.3, 3.3),
+                value=0
+            )
         ])
     else:
         train_transform = transforms.Compose([

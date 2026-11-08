@@ -182,6 +182,7 @@ class CIFAR100CNNV3(nn.Module):
         self.classifier = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
             nn.Flatten(),
+            nn.Dropout(p=0.3),
             nn.Linear(256, 100)
         )
 

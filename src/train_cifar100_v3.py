@@ -110,8 +110,8 @@ def main():
     best_epoch = 0
     history = []
 
-    model_path = MODEL_DIR / "best_cifar100_v3.pth"
-    csv_path = RESULT_DIR / "cifar100_v3_history.csv"
+    model_path = MODEL_DIR / "best_cifar100_v3_2.pth"
+    csv_path = RESULT_DIR / "cifar100_v3_2_history.csv"
 
     for epoch in range(1, EPOCHS + 1):
         current_lr = optimizer.param_groups[0]["lr"]
