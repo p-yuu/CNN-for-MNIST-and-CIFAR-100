@@ -5,6 +5,7 @@ from PIL import Image
 import torch
 from torch.utils.data import Subset, Dataset, DataLoader, random_split 
 from torchvision import datasets, transforms
+from torchvision.transforms import InterpolationMode
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent 
@@ -53,7 +54,7 @@ class LocalCIFAR100(Dataset):
         return image, label
 
 
-def get_cifar100_loaders(batch_size=128, augment=False):
+def get_cifar100_loaders(batch_size=128, augment=False, augmentation="v4"):
     cifar_dir = DATA_DIR / "cifar-100-python"
 
     if not cifar_dir.is_dir():
@@ -66,24 +67,42 @@ def get_cifar100_loaders(batch_size=128, augment=False):
     mean = (0.5071, 0.4867, 0.4408)         # RGB 平均值
     std = (0.2675, 0.2565, 0.2761)          # RGB 標準差
 
-    if augment:
+    if not augment:
+        train_transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ])
+
+    elif augmentation == "v4":
         train_transform = transforms.Compose([
             transforms.RandomCrop(32, padding=4),       # 隨機裁切
             transforms.RandomHorizontalFlip(p=0.5),     # 隨機水平翻轉
             transforms.ToTensor(),                      # 轉換成 Tensor
-            transforms.Normalize(mean, std),
-            transforms.RandomErasing(                   # 隨機遮蔽
+            transforms.Normalize(mean, std),            # 隨機遮蔽
+            transforms.RandomErasing(
                 p=0.25,
                 scale=(0.02, 0.10),
                 ratio=(0.3, 3.3),
-                value=0
-            )
+                value=0,
+            ),
         ])
-    else:
+
+    elif augmentation == "v5":
         train_transform = transforms.Compose([
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.RandAugment(
+                num_ops=2,
+                magnitude=5,
+                interpolation=InterpolationMode.BILINEAR,
+                fill=(125, 123, 114),
+            ),
             transforms.ToTensor(),
-            transforms.Normalize(mean, std)
+            transforms.Normalize(mean, std),
         ])
+
+    else:
+        raise ValueError(f"Unknown augmentation: {augmentation}")
 
     # Validation / Test: no augmentation
     eval_transform = transforms.Compose([

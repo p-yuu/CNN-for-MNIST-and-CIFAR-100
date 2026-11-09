@@ -181,7 +181,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("Device:", device)
 
-    train_loader, val_loader, _ = get_cifar100_loaders(batch_size=BATCH_SIZE,augment=True)
+    train_loader, val_loader, _ = get_cifar100_loaders(batch_size=BATCH_SIZE,augment=True,augmentation="v5")
     model = CIFAR100CNNV3().to(device)
     ema = ModelEMA(model, decay=0.999)
     train_criterion = nn.CrossEntropyLoss(label_smoothing=0.05)

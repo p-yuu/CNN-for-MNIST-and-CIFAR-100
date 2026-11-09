@@ -8,7 +8,7 @@ from model import CIFAR100CNNV3
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE_DIR / "outputs" / "models" / "best_cifar100_v4_ema.pth"
+MODEL_PATH = BASE_DIR / "outputs" / "models" / "best_cifar100_v7_ema.pth"
 
 BATCH_SIZE = 128
 
