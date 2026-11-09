@@ -4,11 +4,11 @@ import torch
 import torch.nn as nn
 
 from data_loader import get_cifar100_loaders
-from model import CIFAR100CNNV2
+from model import CIFAR100CNNV3
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = BASE_DIR / "outputs" / "models" / "best_cifar100_v2.pth"
+MODEL_PATH = BASE_DIR / "outputs" / "models" / "best_cifar100_v4_ema.pth"
 
 BATCH_SIZE = 128
 
@@ -42,7 +42,7 @@ def main():
     print("Device:", device)
 
     train_loader, val_loader, _ = get_cifar100_loaders(batch_size=BATCH_SIZE,augment=False)
-    model = CIFAR100CNNV2().to(device)
+    model = CIFAR100CNNV3().to(device)
 
     if not MODEL_PATH.is_file():
         raise FileNotFoundError(f"Model not found: {MODEL_PATH}")

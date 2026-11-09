@@ -20,7 +20,7 @@ MODEL_DIR.mkdir(parents=True, exist_ok=True)
 RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-EPOCHS = 50
+EPOCHS = 100
 BATCH_SIZE = 128
 LEARNING_RATE = 0.001
 WEIGHT_DECAY = 1e-4
@@ -47,6 +47,33 @@ def mixup_data(images, labels, alpha=0.2):
     labels_b = labels[indices]
 
     return mixed_images, labels_a, labels_b, lam
+
+
+def cutmix_data(images, labels, alpha=1.0):     # alpha：控制裁切區域大小
+    lam = np.random.beta(alpha, alpha)          # 隨機產生 lambda (ex: 0.7 表原始圖片保留 70% 的面積，另一張圖片提供 30%)
+
+    batch_size, _, height, width = images.shape
+    indices = torch.randperm(batch_size, device=images.device)  # 隨機打亂圖片順序
+
+    cut_ratio = np.sqrt(1.0 - lam)      # 計算裁切區域大小
+    cut_w = int(width * cut_ratio)
+    cut_h = int(height * cut_ratio)
+
+    cx = np.random.randint(width)       # 隨機決定裁切中心點
+    cy = np.random.randint(height)
+
+    x1 = np.clip(cx - cut_w // 2, 0, width)
+    x2 = np.clip(cx + cut_w // 2, 0, width)
+    y1 = np.clip(cy - cut_h // 2, 0, height)
+    y2 = np.clip(cy + cut_h // 2, 0, height)
+
+    mixed_images = images.clone()
+    mixed_images[:, :, y1:y2, x1:x2] = (images[indices, :, y1:y2, x1:x2])   # 疊圖
+
+    patch_area = (x2 - x1) * (y2 - y1)          # 重新計算 lambda
+    lam = 1.0 - patch_area / (width * height)
+
+    return mixed_images, labels, labels[indices], lam
 
 
 def train_one_epoch(model, loader, criterion, optimizer, device, epoch):
@@ -124,8 +151,8 @@ def main():
     best_epoch = 0
     history = []
 
-    model_path = MODEL_DIR / "best_cifar100_v3_3.pth"
-    csv_path = RESULT_DIR / "cifar100_v3_3_history.csv"
+    model_path = MODEL_DIR / "best_cifar100_v3_5.pth"
+    csv_path = RESULT_DIR / "cifar100_v3_5_history.csv"
 
     for epoch in range(1, EPOCHS + 1):
         current_lr = optimizer.param_groups[0]["lr"]
