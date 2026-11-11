@@ -2,4 +2,8 @@ data/
 
 src/__pycache__
 
+test_in_class/src/export_cifar100.py
+
 *.pdf
+
+test_in_class/outputs

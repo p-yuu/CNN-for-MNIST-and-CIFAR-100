@@ -22,7 +22,7 @@ MODEL_DIR.mkdir(parents=True, exist_ok=True)
 RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-EPOCHS = 50
+EPOCHS = 100
 BATCH_SIZE = 128
 LEARNING_RATE = 0.1
 WEIGHT_DECAY = 1e-4
@@ -197,8 +197,8 @@ def main():
 
     history = []
 
-    model_path = MODEL_DIR / "best_cifar100_v7.pth"
-    csv_path = RESULT_DIR / "cifar100_v7_history.csv"
+    model_path = MODEL_DIR / "best_cifar100_v7_1.pth"
+    csv_path = RESULT_DIR / "cifar100_v7_1_history.csv"
 
     for epoch in range(1, EPOCHS + 1):
         current_lr = optimizer.param_groups[0]["lr"]
@@ -222,7 +222,7 @@ def main():
         if ema_val_acc > best_ema_val_acc:
             best_ema_val_acc = ema_val_acc
             best_ema_epoch = epoch
-            torch.save(ema.ema.state_dict(),MODEL_DIR / "best_cifar100_v7_ema.pth")
+            torch.save(ema.ema.state_dict(),MODEL_DIR / "best_cifar100_v7_1_ema.pth")
 
         history.append({
             "epoch": epoch,
@@ -262,7 +262,7 @@ def main():
     print(f"Best EMA Epoch: {best_ema_epoch}")
     print(f"Best EMA Validation Accuracy: {best_ema_val_acc * 100:.2f}%")
     print(f"Saved Model: {model_path}")
-    print(f"Saved EMA Model: {MODEL_DIR / 'best_cifar100_v7_ema.pth'}")
+    print(f"Saved EMA Model: {MODEL_DIR / 'best_cifar100_v7_1_ema.pth'}")
     print(f"Saved History: {csv_path}")
 
 
