@@ -14,10 +14,10 @@ from data_loader import IMAGE_SIZE, MEAN, STD
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-TEST_DIR = BASE_DIR / "data" / "test"
+TEST_DIR = BASE_DIR / "data" / "411385013"
 MODEL_PATH = BASE_DIR / "outputs" / "models" / "best_model.pth"
 MAPPING_PATH = BASE_DIR / "outputs" / "results" / "idx_to_class.json"
-OUTPUT_PATH = BASE_DIR / "outputs" / "results" / "411385019.txt"
+OUTPUT_PATH = BASE_DIR / "outputs" / "results" / "411385013.txt"
 
 BATCH_SIZE = 128
 IMAGE_EXTENSIONS = {".png", ".jpg", ".jpeg", ".bmp", ".webp"}
@@ -77,10 +77,10 @@ def predict(model, loader, idx_to_class, device):
         probs_original = F.softmax(logits_original, dim=1)
         probs_flipped = F.softmax(logits_flipped, dim=1)
 
-        # probs_tta = (0.5 * probs_original + 0.5 * probs_flipped)
+        probs_tta = (0.5 * probs_original + 0.5 * probs_flipped)
 
-        # predictions = probs_tta.argmax(dim=1).cpu().tolist()
-        predictions = probs_original.argmax(dim=1).cpu().tolist()
+        predictions = probs_tta.argmax(dim=1).cpu().tolist()
+        # predictions = probs_original.argmax(dim=1).cpu().tolist()
 
         for image_name, pred in zip(image_names, predictions):
             class_name = idx_to_class[str(pred)]

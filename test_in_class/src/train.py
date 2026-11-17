@@ -27,7 +27,7 @@ HISTORY_PATH = RESULT_DIR / "training_history.csv"
 
 
 SEED = 42
-EPOCHS = 100
+EPOCHS = 50
 BATCH_SIZE = 128
 LEARNING_RATE = 0.1
 MIN_LR = 1e-4
